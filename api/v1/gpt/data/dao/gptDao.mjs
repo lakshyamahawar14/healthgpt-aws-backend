@@ -83,11 +83,11 @@ const getSystemRoleMessage = async (
     if (isNegativeBelief === true) {
       systemRoleMessage += ` User is identiefied to be having negative beliefs as '${belief}'`+ askInDeepString;
     } else {
-      systemRoleMessage += oldUserInstruction + ` Try to gather information about what symptoms or beliefs user might be expericencing.`;
+      systemRoleMessage += oldUserInstruction + ` Try to gather information more information about what symptoms or beliefs user might be expericencing.`;
     }
   } else if (numberOfMessages < 10) {
     if (isNegativeBelief === true) {
-      systemRoleMessage += positiveBeliefString+` User is identiefied to be having negative beliefs as '${belief}'. If these beliefs are sufficient to classify the disorder, Try to assist the user by telling the solution and converting his beliefs into positive ones. Otherwise, go deeper.`;;
+      systemRoleMessage += positiveBeliefString+` User is identiefied to be having negative beliefs as '${belief}'. If these beliefs are sufficient to classify the disorder, Try to assist the user by telling the solution and converting his beliefs into positive ones. Otherwise, go try to gather more information about user's symptoms and beliefs.`;;
     } else {
       systemRoleMessage += newUserInstruction;
     }
