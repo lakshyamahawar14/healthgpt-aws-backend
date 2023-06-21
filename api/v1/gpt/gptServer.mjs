@@ -29,7 +29,7 @@ app.use("/api/v1/gpt", router);
 app.use(sendInvalidRouteError);
 app.use(sendNoParametersSentError);
 
-const port = process.env.GPT_API_PORT || 2001;
+const port = process.env.GPT_API_PORT || 9001;
 
 app.listen(port, () => {
   console.log(`gpt server is listening on port ${port}`);
