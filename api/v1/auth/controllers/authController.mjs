@@ -83,7 +83,7 @@ const signupUser = async (req, res) => {
                 response: `Hello ${username}, I am Lux, an AI chatbot made to provide mental health support, I'm pleased to see you here, what would you like to talk about today?`,
               },
             ],
-            posts: [],
+            posts: "",
             summary: "",
             symptom: "",
             belief: "",
