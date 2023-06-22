@@ -11,6 +11,8 @@ import {
   updateBelief,
   getScore,
   updateScore,
+  getUserPosts,
+  updateUserPosts,
 } from "../controllers/dbController.mjs";
 
 const router = express.Router();
@@ -26,5 +28,7 @@ router.get("/belief", getBelief);
 router.post("/belief", updateBelief);
 router.get("/score", getScore);
 router.post("/score", updateScore);
+router.get("/posts", getUserPosts);
+router.post("/posts", updateUserPosts);
 
 export { router };

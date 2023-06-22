@@ -478,6 +478,95 @@ const updateScore = async(req, res) => {
   }
 }
 
+const getUserPosts = async(req, res) => {
+  try {
+    const userId = req.query.userId;
+    const accessToken = req.query.accessToken;
+
+    if (!userId || !accessToken) {
+      return sendNoParametersSentError(req, res, "error");
+    }
+
+    firebaseAdmin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then((decodedToken) => {
+        const uid = decodedToken.uid;
+        if (uid !== userId) {
+          throw new Error(
+            "Access denied: userId does not match the token's UID"
+          );
+        }
+
+        const dataRef = firebaseAdmin.database().ref(`users/${userId}/posts`);
+
+        return dataRef.once("value");
+      })
+      .then((snapshot) => {
+        const data = snapshot.val();
+
+        return sendSuccessResponse(
+          req,
+          res,
+          { posts: data },
+          "User Posts Fetched Successfully"
+        );
+      })
+      .catch((error) => {
+        return sendFailureResponse(req, res, error.message);
+      });
+  } catch (error) {
+    return sendInternalServerError(req, res, "error");
+  }
+}
+
+const updateUserPosts = async (req, res) => {
+  try {
+    const { userId, accessToken, postObject } = req.body;
+    if (!userId || !postObject || !accessToken) {
+      return sendNoParametersSentError(req, res, "error");
+    }
+
+    firebaseAdmin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then((decodedToken) => {
+        const uid = decodedToken.uid;
+        if (uid !== userId) {
+          throw new Error(
+            "Access denied: userId does not match the token's UID"
+          );
+        }
+
+        const dataRef = firebaseAdmin.database().ref(`users/${userId}/posts`);
+
+        return dataRef.once("value");
+      })
+      .then((snapshot) => {
+        const posts = snapshot.val();
+        const previousPosts = posts[posts.length - 1];
+
+        const updatedPostsObject = {
+          ...postObject,
+          postId: previousPosts ? previousPosts.postId + 1 : 1,
+        };
+
+        const updatedPosts = [...posts, updatedPostsObject];
+
+        const userRef = firebaseAdmin.database().ref(`users/${userId}`);
+        return userRef.update({ posts: updatedPosts });
+      })
+      .then(() => {
+        return sendSuccessResponse(req, res, null, "User Posts Updated Successfully");
+      })
+      .catch((error) => {
+        return sendFailureResponse(req, res, error.message);
+      });
+  } catch (error) {
+    return sendInternalServerError(req, res, "error");
+  }
+};
+
 export {
   getChat,
   updateChat,
@@ -489,5 +578,7 @@ export {
   getBelief,
   updateBelief,
   getScore,
-  updateScore
+  updateScore,
+  getUserPosts,
+  updateUserPosts,
 };

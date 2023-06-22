@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "start": "concurrently \"node --experimental-modules --no-warnings api/v1/news/newsServer.mjs\" \"node --experimental-modules --no-warnings api/v1/auth/authServer.mjs\" \"node --experimental-modules --no-warnings api/v1/db/dbServer.mjs\" \"node --experimental-modules --no-warnings api/v1/gpt/gptServer.mjs\" \"node --experimental-modules --no-warnings api/v1/assessment/assessmentServer.mjs\""
+    "start": "concurrently \"node --experimental-modules --no-warnings api/v1/news/newsServer.mjs\" \"node --experimental-modules --no-warnings api/v1/auth/authServer.mjs\" \"node --experimental-modules --no-warnings api/v1/db/dbServer.mjs\" \"node --experimental-modules --no-warnings api/v1/gpt/gptServer.mjs\" \"node --experimental-modules --no-warnings api/v1/assessment/assessmentServer.mjs\" \"node --experimental-modules --no-warnings api/v1/forum/forumServer.mjs\""
   },
   "dependencies": {
     "axios": "^1.4.0",
