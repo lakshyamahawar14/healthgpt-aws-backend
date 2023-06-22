@@ -546,9 +546,10 @@ const updateUserPosts = async (req, res) => {
         const posts = snapshot.val();
         const previousPosts = posts[posts.length - 1];
 
+        const previousPostIdNumber = previousPosts ? parseInt(previousPosts.postId.split(userId)[1]) : 0;
         const updatedPostsObject = {
           ...postObject,
-          postId: previousPosts ? previousPosts.postId + 1 : 1,
+          postId: userId + (previousPosts ? previousPostIdNumber + 1 : 1),
         };
 
         const updatedPosts = [...posts, updatedPostsObject];
@@ -560,6 +561,7 @@ const updateUserPosts = async (req, res) => {
         return sendSuccessResponse(req, res, null, "User Posts Updated Successfully");
       })
       .catch((error) => {
+        console.log(error);
         return sendFailureResponse(req, res, error.message);
       });
   } catch (error) {
