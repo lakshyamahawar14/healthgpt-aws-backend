@@ -391,7 +391,7 @@ const updateBelief = async (req, res) => {
   }
 };
 
-const getScore = async(req, res) => {
+const getScore = async (req, res) => {
   try {
     const userId = req.query.userId;
     const accessToken = req.query.accessToken;
@@ -412,13 +412,15 @@ const getScore = async(req, res) => {
           );
         }
 
-        const dataRef = firebaseAdmin.database().ref(`users/${userId}${url}Score`);
+        const dataRef = firebaseAdmin
+          .database()
+          .ref(`users/${userId}${url}Score`);
 
         return dataRef.once("value");
       })
       .then((snapshot) => {
         const data = snapshot.val();
-        const scoreType = url.slice(1)+"Score";
+        const scoreType = url.slice(1) + "Score";
         return sendSuccessResponse(
           req,
           res,
@@ -432,13 +434,13 @@ const getScore = async(req, res) => {
   } catch (error) {
     return sendInternalServerError(req, res, "error");
   }
-}
+};
 
-const updateScore = async(req, res) => {
-  try{
+const updateScore = async (req, res) => {
+  try {
     const { userId, accessToken, url, score } = req.body;
 
-    if(!userId || !accessToken || !url || !score){
+    if (!userId || !accessToken || !url || !score) {
       return sendNoParametersSentError(req, res, "error");
     }
 
@@ -452,14 +454,16 @@ const updateScore = async(req, res) => {
             "Access denied: userId does not match the token's UID"
           );
         }
-        const dataRef = firebaseAdmin.database().ref(`users/${userId}${url}Score`);
+        const dataRef = firebaseAdmin
+          .database()
+          .ref(`users/${userId}${url}Score`);
 
         return dataRef.once("value");
       })
       .then((snapshot) => {
         const userRef = firebaseAdmin.database().ref(`users/${userId}`);
-        const scoreType = url.slice(1)+"Score";
-        return userRef.update({ [scoreType] : score});
+        const scoreType = url.slice(1) + "Score";
+        return userRef.update({ [scoreType]: score });
       })
       .then(() => {
         return sendSuccessResponse(
@@ -472,13 +476,12 @@ const updateScore = async(req, res) => {
       .catch((error) => {
         return sendFailureResponse(req, res, error.message);
       });
-  }
-  catch(error){
+  } catch (error) {
     return sendInternalServerError(req, res, "error");
   }
-}
+};
 
-const getUserPosts = async(req, res) => {
+const getUserPosts = async (req, res) => {
   try {
     const userId = req.query.userId;
     const accessToken = req.query.accessToken;
@@ -518,7 +521,7 @@ const getUserPosts = async(req, res) => {
   } catch (error) {
     return sendInternalServerError(req, res, "error");
   }
-}
+};
 
 const updateUserPosts = async (req, res) => {
   try {
@@ -546,7 +549,9 @@ const updateUserPosts = async (req, res) => {
         const posts = snapshot.val();
         const previousPosts = posts[posts.length - 1];
 
-        const previousPostIdNumber = previousPosts ? parseInt(previousPosts.postId.split(userId)[1]) : 0;
+        const previousPostIdNumber = previousPosts
+          ? parseInt(previousPosts.postId.split(userId)[1])
+          : 0;
         const updatedPostsObject = {
           ...postObject,
           postId: userId + (previousPosts ? previousPostIdNumber + 1 : 1),
@@ -558,7 +563,12 @@ const updateUserPosts = async (req, res) => {
         return userRef.update({ posts: updatedPosts });
       })
       .then(() => {
-        return sendSuccessResponse(req, res, null, "User Posts Updated Successfully");
+        return sendSuccessResponse(
+          req,
+          res,
+          null,
+          "User Posts Updated Successfully"
+        );
       })
       .catch((error) => {
         console.log(error);
