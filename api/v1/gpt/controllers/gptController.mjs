@@ -208,7 +208,7 @@ const getDavinciUserBelief = async (req, res) => {
     fetchUserChat(req, res, userId, accessToken)
       .then((userChat) => {
         const beliefString =
-          "\nThis is the conversation between a user and a mental health therapist. From this conversation determine if the patient has any negative beliefs. Remember that you have to consider user's latest message. If user says that he's not experiencing any symptoms or negative beliefs, your response must be a 'No'. If user's latest message says that he is experiencing negative beliefs, your response must be a 'Yes', followed by that negative belief.";
+          "\nThis is the conversation between a user and a mental health therapist. From this conversation determine if the patient has any negative beliefs. Remember that you have to consider user's latest messages for atmost priority. Remember that if user says that he/she is not experiencing any symptoms or negative beliefs, your response must be a 'No'. If user's latest message says that he is experiencing negative beliefs, your response must be a 'Yes', followed by that negative belief.\n";
 
         convertChatToString(req, res, userChat, beliefString, numberOfMessages)
           .then((chat) => {
@@ -258,7 +258,7 @@ const getDavinciUserSymptom = async (req, res) => {
     fetchUserChat(req, res, userId, accessToken)
       .then((userChat) => {
         const symptomString =
-          "\nThis is the conversation between a user and a mental health therapist. From this conversation, You have to determine, with which mental illness the user might be suffering from. Remember that you have to consider user's latest message. If, the user says he/she is not experiencing the symptoms anymore or he/she is now fine, your response must be a'no'. Otherwise, your response must be the name of the mental illness, from which the symptom belongs. Your choices for choosing mental illness is in this array of mental illness: ['anxiety', 'ptsd', 'trauma', 'short term memory loss', 'schizophrenia', 'autism', 'insomnia', 'depression', 'phobia', 'bipolar disorder', 'borderline personality disorder', 'alzheimer', 'adhd', 'headache', 'other']. That mental illness *must be one from the array* of mental illness provided. You must have to respond in *one word only*, the name of the mental illness.";
+          "\nThis is the conversation between a user and a mental health therapist. From this conversation, You have to determine, with which mental illness the user might be suffering from. Remember that you have to consider user's latest messages for atmost priority. If, the user says he/she is not experiencing the symptoms anymore, then only your response must be a'no'. Otherwise, your response must be the name of the mental illness, from which the symptom belongs. Your choices for choosing mental illness is in this array of mental illness: ['anxiety', 'ptsd', 'trauma', 'short term memory loss', 'schizophrenia', 'autism', 'insomnia', 'depression', 'phobia', 'bipolar disorder', 'borderline personality disorder', 'alzheimer', 'adhd', 'headache', 'others']. That mental illness *must be one from the array* of mental illness provided. You must have to respond in *one word only*, the name of the mental illness.\n";
 
         convertChatToString(req, res, userChat, symptomString, numberOfMessages)
           .then((chat) => {
@@ -302,5 +302,5 @@ export {
   getAdaSummary,
   getDavinciSummary,
   getDavinciUserBelief,
-  getDavinciUserSymptom
+  getDavinciUserSymptom,
 };
