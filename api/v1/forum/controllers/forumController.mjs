@@ -94,30 +94,15 @@ const getPosts = async (req, res) => {
 
 const getPost = async (req, res) => {
   try {
-    const userId = req.query.userId;
-    const accessToken = req.query.accessToken;
     const postId = req.query.postId;
 
-    if (!userId || !accessToken || !postId) {
+    if (!postId) {
       return sendNoParametersSentError(req, res, "error");
     }
-
-    firebaseAdmin
-      .auth()
-      .verifyIdToken(accessToken)
-      .then((decodedToken) => {
-        const uid = decodedToken.uid;
-        if (uid !== userId) {
-          throw new Error(
-            "Access denied: userId does not match the token's UID"
-          );
-        }
-        const postUserId = postId.substring(0, 28);
-        const dataRef = firebaseAdmin
-          .database()
-          .ref(`users/${postUserId}/posts`);
-        return dataRef.once("value");
-      })
+    const postUserId = postId.substring(0, 28);
+    const dataRef = firebaseAdmin.database().ref(`users/${postUserId}/posts`);
+    dataRef
+      .once("value")
       .then((snapshot) => {
         const data = snapshot.val();
         let post = {};
@@ -140,6 +125,62 @@ const getPost = async (req, res) => {
       });
   } catch (error) {
     console.log(error);
+    return sendInternalServerError(req, res, "error");
+  }
+};
+
+const updatePost = async (req, res) => {
+  try {
+    const { userId, accessToken, postObject } = req.body;
+    if (!userId || !postObject || !accessToken) {
+      return sendNoParametersSentError(req, res, "error");
+    }
+
+    firebaseAdmin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then((decodedToken) => {
+        const uid = decodedToken.uid;
+        if (uid !== userId) {
+          throw new Error(
+            "Access denied: userId does not match the token's UID"
+          );
+        }
+
+        const dataRef = firebaseAdmin.database().ref(`users/${userId}/posts`);
+
+        return dataRef.once("value");
+      })
+      .then((snapshot) => {
+        const posts = snapshot.val();
+        const previousPosts = posts[posts.length - 1];
+
+        const previousPostIdNumber = previousPosts
+          ? parseInt(previousPosts.postId.split(userId)[1])
+          : 0;
+        const updatedPostsObject = {
+          ...postObject,
+          postId: userId + (previousPosts ? previousPostIdNumber + 1 : 1),
+        };
+
+        const updatedPosts = [...posts, updatedPostsObject];
+
+        const userRef = firebaseAdmin.database().ref(`users/${userId}`);
+        return userRef.update({ posts: updatedPosts });
+      })
+      .then(() => {
+        return sendSuccessResponse(
+          req,
+          res,
+          null,
+          "User Posts Updated Successfully"
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+        return sendFailureResponse(req, res, error.message);
+      });
+  } catch (error) {
     return sendInternalServerError(req, res, "error");
   }
 };
@@ -201,4 +242,4 @@ const updateComments = async (req, res) => {
   }
 };
 
-export { getPosts, getPost, updateComments };
+export { getPosts, updatePost, getPost, updateComments };
