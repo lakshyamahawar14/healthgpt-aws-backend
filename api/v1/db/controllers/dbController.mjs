@@ -397,7 +397,7 @@ const getScore = async (req, res) => {
     const accessToken = req.query.accessToken;
     const url = req.query.url;
 
-    if (!userId || !accessToken) {
+    if (!userId || !accessToken || !url) {
       return sendNoParametersSentError(req, res, "error");
     }
 
@@ -412,19 +412,31 @@ const getScore = async (req, res) => {
           );
         }
 
-        const dataRef = firebaseAdmin
-          .database()
-          .ref(`users/${userId}${url}Score`);
+        const dataRef = firebaseAdmin.database().ref(`users/${userId}/scores`);
 
         return dataRef.once("value");
       })
       .then((snapshot) => {
         const data = snapshot.val();
-        const scoreType = url.slice(1) + "Score";
+        let score = "";
+        data.forEach((s) => {
+          if (s.url === url) {
+            score = s;
+            return;
+          }
+        });
+        if (score === "") {
+          return sendFailureResponse(
+            req,
+            res,
+            "No Score found with given Url",
+            "failure"
+          );
+        }
         return sendSuccessResponse(
           req,
           res,
-          { [scoreType]: data },
+          { score: score },
           "Score Fetched Successfully"
         );
       })
@@ -438,9 +450,9 @@ const getScore = async (req, res) => {
 
 const updateScore = async (req, res) => {
   try {
-    const { userId, accessToken, url, score } = req.body;
+    const { userId, accessToken, url, scoreObj } = req.body;
 
-    if (!userId || !accessToken || !url || !score) {
+    if (!userId || !accessToken || !url || !scoreObj) {
       return sendNoParametersSentError(req, res, "error");
     }
 
@@ -454,16 +466,36 @@ const updateScore = async (req, res) => {
             "Access denied: userId does not match the token's UID"
           );
         }
-        const dataRef = firebaseAdmin
-          .database()
-          .ref(`users/${userId}${url}Score`);
+        const dataRef = firebaseAdmin.database().ref(`users/${userId}/scores`);
 
         return dataRef.once("value");
       })
       .then((snapshot) => {
-        const userRef = firebaseAdmin.database().ref(`users/${userId}`);
-        const scoreType = url.slice(1) + "Score";
-        return userRef.update({ [scoreType]: score });
+        if (url === "/general") {
+          let score = scoreObj;
+          const oldScores = snapshot.val();
+          const userRef = firebaseAdmin.database().ref(`users/${userId}`);
+          let newScores = [];
+          oldScores.forEach((s) => {
+            if (s.url === "/general") {
+              s.scores = score;
+            }
+            newScores.push(s);
+          });
+          return userRef.update({ scores: newScores });
+        } else {
+          let score = scoreObj[0].score;
+          const oldScores = snapshot.val();
+          const userRef = firebaseAdmin.database().ref(`users/${userId}`);
+          let newScores = [];
+          oldScores.forEach((s) => {
+            if (s.url === url) {
+              s.score = score;
+            }
+            newScores.push(s);
+          });
+          return userRef.update({ scores: newScores });
+        }
       })
       .then(() => {
         return sendSuccessResponse(

@@ -57,12 +57,13 @@ const signupUser = async (req, res) => {
       .auth()
       .createUser({
         email: email,
-        // emailVerified: false,
+        emailVerified: false,
         // phoneNumber: '+11234567890',
         password: password,
         displayName: username,
-        // photoURL: 'http://www.example.com/12345678/photo.png',
-        // disabled: false,
+        photoURL:
+          "https://i.pinimg.com/736x/8b/11/a8/8b11a86980c64720a41ec22332a83115.jpg",
+        disabled: false,
       })
       .then((userRecord) => {
         firebaseAdmin
@@ -72,7 +73,6 @@ const signupUser = async (req, res) => {
             userId: userRecord.uid,
             username: username,
             email: email,
-            password: password,
             age: age,
             gender: gender,
             chat: [
@@ -294,17 +294,17 @@ const signupUser = async (req, res) => {
                 ],
               },
             ],
-            depressionScore: [{ name: "depression", score: -1 }],
-            anxietyScore: [{ name: "anxiety", score: -1 }],
-            ptsdScore: [{ name: "ptsd", score: -1 }],
-            bipolarScore: [{ name: "bipolar", score: -1 }],
-            insomniaScore: [{ name: "insomnia", score: -1 }],
-            generalScore: [
-              { name: "depression", score: -1 },
-              { name: "anxiety", score: -1 },
-              { name: "ptsd", score: -1 },
-              { name: "bipolar", score: -1 },
-              { name: "insomnia", score: -1 },
+            scores: [
+              { url: "/depression", name: "depression", score: -1 },
+              { url: "/anxiety", name: "anxiety", score: -1 },
+              { url: "/ptsd", name: "ptsd", score: -1 },
+              { url: "/bipolar", name: "bipolar", score: -1 },
+              { url: "/insomnia", name: "insomnia", score: -1 },
+              {
+                url: "/general",
+                name: "general",
+                scores: "",
+              },
             ],
           });
 

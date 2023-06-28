@@ -61,9 +61,15 @@ const getTests = async (req, res) => {
   }
 };
 
-const getGeneralTest = async (req, res) => {
+const getTest = async (req, res) => {
   try {
-    const test = {
+    const url = req.query.url;
+
+    if (!url) {
+      return sendNoParametersSentError(req, res, "error");
+    }
+
+    const generalTest = {
       title: "General Cognitive Assessment Test",
       questions: [
         "Do you often have difficulty concentrating or staying focused?",
@@ -98,21 +104,8 @@ const getGeneralTest = async (req, res) => {
         "Do you frequently experience difficulties in social interactions or understanding social cues?",
       ],
     };
-    return sendSuccessResponse(
-      req,
-      res,
-      { test: test },
-      "Successfully Fetched General Cognitive Test",
-      "success"
-    );
-  } catch (error) {
-    return sendInternalServerError(req, res, "error");
-  }
-};
 
-const getDepressionTest = async (req, res) => {
-  try {
-    const test = {
+    const depressionTest = {
       title: "Depression Assessment Test",
       questions: [
         "Have you been feeling persistently sad or empty for most of the day, nearly every day, for the past two weeks or more? (Yes/No)",
@@ -127,21 +120,8 @@ const getDepressionTest = async (req, res) => {
         "Have these symptoms significantly interfered with your daily functioning, such as work, school, relationships, or self-care? (Yes/No)",
       ],
     };
-    return sendSuccessResponse(
-      req,
-      res,
-      { test: test },
-      "Successfully Fetched Depression Test",
-      "success"
-    );
-  } catch (error) {
-    return sendInternalServerError(req, res, "error");
-  }
-};
 
-const getAnxietyTest = async (req, res) => {
-  try {
-    const test = {
+    const anxietyTest = {
       title: "Anxiety Assessment Test",
       questions: [
         "Do you often feel restless or on edge?",
@@ -156,21 +136,8 @@ const getAnxietyTest = async (req, res) => {
         "Do you frequently experience intense anxiety or panic attacks?",
       ],
     };
-    return sendSuccessResponse(
-      req,
-      res,
-      { test: test },
-      "Successfully Fetched Anxiety Test",
-      "success"
-    );
-  } catch (error) {
-    return sendInternalServerError(req, res, "error");
-  }
-};
 
-const getPtsdTest = async (req, res) => {
-  try {
-    const test = {
+    const ptsdTest = {
       title: "PTSD Assessment Test",
       questions: [
         "Have you experienced or witnessed a traumatic event?",
@@ -185,21 +152,8 @@ const getPtsdTest = async (req, res) => {
         "Do you have a diminished interest or participation in significant activities, feeling detached from others, or experiencing a sense of a limited future since the traumatic event?",
       ],
     };
-    return sendSuccessResponse(
-      req,
-      res,
-      { test: test },
-      "Successfully Fetched PTSD Test",
-      "success"
-    );
-  } catch (error) {
-    return sendInternalServerError(req, res, "error");
-  }
-};
 
-const getBipolarTest = async (req, res) => {
-  try {
-    const test = {
+    const bipolarTest = {
       title: "Bipolar Assessment Test",
       questions: [
         "Have you experienced periods of unusually elevated mood and energy (e.g., excessive happiness, euphoria, or irritability)?",
@@ -214,21 +168,8 @@ const getBipolarTest = async (req, res) => {
         "Have you had recurrent thoughts of death, suicidal ideation, or suicide attempts?",
       ],
     };
-    return sendSuccessResponse(
-      req,
-      res,
-      { test: test },
-      "Successfully Fetched Bipolar Test",
-      "success"
-    );
-  } catch (error) {
-    return sendInternalServerError(req, res, "error");
-  }
-};
 
-const getInsomniaTest = async (req, res) => {
-  try {
-    const test = {
+    const insomniaTest = {
       title: "Insomnia Assessment Test",
       questions: [
         "Do you have difficulty falling asleep at night?",
@@ -243,13 +184,63 @@ const getInsomniaTest = async (req, res) => {
         "Have you experienced insomnia symptoms for at least three nights per week for at least three months?",
       ],
     };
-    return sendSuccessResponse(
-      req,
-      res,
-      { test: test },
-      "Successfully Fetched Insomnia Test",
-      "success"
-    );
+
+    if (url === "/depression") {
+      return sendSuccessResponse(
+        req,
+        res,
+        { test: depressionTest },
+        "Successfully Fetched Depression Test",
+        "success"
+      );
+    } else if (url === "/anxiety") {
+      return sendSuccessResponse(
+        req,
+        res,
+        { test: anxietyTest },
+        "Successfully Fetched Anxiety Test",
+        "success"
+      );
+    } else if (url === "/ptsd") {
+      return sendSuccessResponse(
+        req,
+        res,
+        { test: ptsdTest },
+        "Successfully Fetched PTSD Test",
+        "success"
+      );
+    } else if (url === "/bipolar") {
+      return sendSuccessResponse(
+        req,
+        res,
+        { test: bipolarTest },
+        "Successfully Fetched Bipolar Test",
+        "success"
+      );
+    } else if (url === "/insomnia") {
+      return sendSuccessResponse(
+        req,
+        res,
+        { test: insomniaTest },
+        "Successfully Fetched Insomnia Test",
+        "success"
+      );
+    } else if (url === "/general") {
+      return sendSuccessResponse(
+        req,
+        res,
+        { test: generalTest },
+        "Successfully Fetched General Test",
+        "success"
+      );
+    } else {
+      return sendFailureResponse(
+        req,
+        res,
+        `No Test found with given Name`,
+        "failure"
+      );
+    }
   } catch (error) {
     return sendInternalServerError(req, res, "error");
   }
@@ -336,6 +327,13 @@ const evaluateScore = async (req, res) => {
       answers = bipolarAnswers;
     } else if (url === "/insomnia") {
       answers = insomniaAnswers;
+    } else {
+      return sendFailureResponse(
+        req,
+        res,
+        "No Test found by given Name",
+        "failure"
+      );
     }
 
     let score = 0;
@@ -349,7 +347,7 @@ const evaluateScore = async (req, res) => {
     return sendSuccessResponse(
       req,
       res,
-      { score: [{ name: url.slice(1), score: score }] },
+      { score: [{ url: url, name: url.slice(1), score: score }] },
       "Score Evaluated Successfully!",
       "success"
     );
@@ -358,7 +356,7 @@ const evaluateScore = async (req, res) => {
   }
 };
 
-const evaluateGeneralTest = async (req, res) => {
+const evaluateGeneralScore = async (req, res) => {
   try {
     const { url, responses } = req.query;
 
@@ -566,13 +564,8 @@ const updateTask = async (req, res) => {
 
 export {
   getTests,
-  getGeneralTest,
-  evaluateGeneralTest,
-  getDepressionTest,
-  getAnxietyTest,
-  getPtsdTest,
-  getBipolarTest,
-  getInsomniaTest,
+  getTest,
+  evaluateGeneralScore,
   evaluateScore,
   getTask,
   updateTask,
