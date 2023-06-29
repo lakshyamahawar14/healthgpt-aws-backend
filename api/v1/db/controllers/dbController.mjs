@@ -77,10 +77,17 @@ const updateChat = async (req, res) => {
         const chat = snapshot.val();
         const previousChat = chat[chat.length - 1];
 
+        const currentDate = new Date().toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        });
+
         const updatedChatObject = {
           ...chatObject,
           id: previousChat ? previousChat.id + 1 : 1,
           key: previousChat ? previousChat.key + 1 : 1,
+          date: currentDate,
         };
 
         const updatedChat = [...chat, updatedChatObject];
