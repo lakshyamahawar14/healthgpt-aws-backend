@@ -10,10 +10,7 @@ dotenv.config({ path: envPath });
 
 import { Configuration, OpenAIApi } from "openai";
 
-const configuration = new Configuration({
-  organization: process.env.ORGANIZATION_ID,
-  apiKey: process.env.OPENAPI_API_KEY,
-});
+const configuration = new Configuration(process.env.OPENAPI_API_KEY);
 const openaiApp = new OpenAIApi(configuration);
 
 export { openaiApp };
