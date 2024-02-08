@@ -5,7 +5,7 @@ export const sendInvalidRouteError = (req, res, statusMsg = "error") => {
     .json({ status: statusMsg, message: "Not Found", statusCode: 404 });
 };
 
-export const sendNoParametersSentError = (req, res, statusMsg = "error") => {
+export  const sendNoParametersSentError = (req, res, statusMsg = "error") => {
   console.log(statusMsg);
   res.status(400).json({
     status: statusMsg,
